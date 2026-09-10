@@ -1,0 +1,6 @@
+.git
+.github
+scripts
+node_modules
+*.md
+i18n.config.json

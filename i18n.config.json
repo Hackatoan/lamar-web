@@ -1,0 +1,8 @@
+{
+  "origin": "https://lamar.hackatoa.com",
+  "locales": ["en", "es", "pt-br", "fr", "de", "vi", "th"],
+  "rootFile": "index.html",
+  "pages": [{ "file": "index.html", "urlPath": "/" }],
+  "internalLinks": {},
+  "keepTerms": ["Lamar", "GTA V", "GTA", "Grand Theft Auto", "Discord", "Hackatoa", "Rockstar", "Los Santos"]
+}

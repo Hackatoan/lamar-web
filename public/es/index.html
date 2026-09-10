@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lamar Bot — Bot de Discord de GTA V</title>
+  <meta name="description" content="Lamar Davis de GTA V, pero ahora vive en tu servidor de Discord. Di burradas, juega y vibra con el bot más real del barrio." />
+  <meta property="og:title" content="Lamar Bot" />
+  <meta property="og:description" content="Lamar Davis de GTA V, en tu servidor de Discord. Con IA, cero paciencia." />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://lamar.hackatoa.com/es/" />
+  <meta property="og:image" content="https://lamar.hackatoa.com/og-image.png" />
+  <meta property="og:site_name" content="Hackatoa" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Lamar Bot — Bot de Discord de GTA V" />
+  <meta name="twitter:description" content="Lamar Davis de GTA V, pero ahora vive en tu servidor de Discord. Di burradas, juega y vibra con el bot más real del barrio." />
+  <meta name="twitter:image" content="https://lamar.hackatoa.com/og-image.png" />
+  <meta name="twitter:site" content="@jhackatoa" />
+  <meta name="robots" content="index, follow" />
+  <meta name="author" content="Preston Harris" />
+  <meta name="keywords" content="Lamar Bot, bot de Discord de GTA V, bot de Discord con IA, bot de Lamar Davis, bot de Discord de GTA, bot de Discord gratis" />
+  <meta name="theme-color" content="#22c55e" />
+  <link rel="canonical" href="https://lamar.hackatoa.com/es/" />
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "Lamar Bot",
+    "description": "Lamar Davis from GTA V — mouthy, chaotic, and powered by Gemini AI. Talk to him, play games, and get roasted.",
+    "url": "https://lamar.hackatoa.com",
+    "applicationCategory": "EntertainmentApplication",
+    "operatingSystem": "Discord",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "author": { "@type": "Person", "name": "Preston Harris", "url": "https://hackatoa.com" }
+  }
+  </script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0f;
+      --surface: #111118;
+      --card: #16161f;
+      --border: #2a2a3a;
+      --accent: #22c55e;
+      --accent2: #16a34a;
+      --gold: #f59e0b;
+      --text: #e8e8f0;
+      --muted: #8888a8;
+      --red: #ef4444;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(10,10,15,0.9);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-brand { font-weight: 800; font-size: 1.15rem; color: var(--accent); letter-spacing: -.5px; }
+    .nav-links { display: flex; gap: 1.5rem; align-items: center; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: .9rem;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--text); }
+    .nav-cta {
+      background: var(--accent); color: #000 !important;
+      padding: .4rem 1rem; border-radius: 6px; font-weight: 700 !important;
+      font-size: .85rem !important;
+    }
+    .nav-cta:hover { background: var(--accent2) !important; }
+
+    /* HERO */
+    .hero {
+      padding: 7rem 2rem 5rem;
+      text-align: center;
+      background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(34,197,94,.08) 0%, transparent 70%);
+    }
+    .hero-tag {
+      display: inline-block;
+      background: rgba(34,197,94,.12);
+      border: 1px solid rgba(34,197,94,.25);
+      color: var(--accent);
+      font-size: .8rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      padding: .3rem .85rem; border-radius: 99px; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 900; letter-spacing: -2px; line-height: 1.05;
+      margin-bottom: 1.25rem;
+    }
+    .hero h1 span { color: var(--accent); }
+    .hero p {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      color: var(--muted); max-width: 540px; margin: 0 auto 2.5rem;
+    }
+    .hero-buttons { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-block; text-decoration: none;
+      padding: .75rem 1.75rem; border-radius: 8px;
+      font-weight: 700; font-size: .95rem; transition: all .2s;
+    }
+    .btn-primary { background: var(--accent); color: #000; }
+    .btn-primary:hover { background: var(--accent2); transform: translateY(-1px); }
+    .btn-secondary {
+      background: transparent; color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--accent); color: var(--accent); }
+
+    /* QUOTE */
+    .quote-section {
+      padding: 3rem 2rem;
+      max-width: 800px; margin: 0 auto;
+      text-align: center;
+    }
+    .quote {
+      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-style: italic; color: var(--muted);
+      border-left: 3px solid var(--accent);
+      padding: 1.25rem 2rem;
+      background: var(--card);
+      border-radius: 0 8px 8px 0;
+      text-align: left;
+    }
+    .quote-attr { margin-top: .75rem; color: var(--accent); font-weight: 600; font-size: .9rem; }
+
+    /* SECTION */
+    section { padding: 5rem 2rem; }
+    .section-inner { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      color: var(--accent); font-size: .8rem; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase; margin-bottom: .75rem;
+    }
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 2.6rem);
+      font-weight: 800; letter-spacing: -1px; margin-bottom: 1rem;
+    }
+    .section-desc { color: var(--muted); font-size: 1.05rem; max-width: 560px; }
+
+    /* FEATURE GRID */
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem; margin-top: 3rem;
+    }
+    .feature-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.75rem;
+      transition: border-color .2s, transform .2s;
+    }
+    .feature-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+    .feature-icon { font-size: 2rem; margin-bottom: .75rem; }
+    .feature-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: .5rem; }
+    .feature-card p { color: var(--muted); font-size: .9rem; line-height: 1.6; }
+
+    /* COMMANDS */
+    .commands-section { background: var(--surface); }
+    .cmd-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1rem; margin-top: 3rem;
+    }
+    .cmd-card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: 1.25rem 1.5rem;
+      display: flex; align-items: flex-start; gap: 1rem;
+    }
+    .cmd-name {
+      font-family: monospace; font-size: .95rem; font-weight: 700;
+      color: var(--accent); white-space: nowrap;
+    }
+    .cmd-desc { color: var(--muted); font-size: .88rem; margin-top: .2rem; }
+
+    /* HOW TO USE */
+    .how-steps {
+      display: flex; flex-direction: column; gap: 1.5rem; margin-top: 3rem;
+      max-width: 600px;
+    }
+    .step { display: flex; gap: 1.25rem; align-items: flex-start; }
+    .step-num {
+      flex-shrink: 0;
+      width: 2rem; height: 2rem; border-radius: 50%;
+      background: var(--accent); color: #000;
+      font-weight: 800; font-size: .9rem;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step h4 { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; }
+    .step p { color: var(--muted); font-size: .9rem; }
+    code {
+      background: rgba(34,197,94,.1); color: var(--accent);
+      padding: .1rem .4rem; border-radius: 4px; font-size: .9em;
+    }
+
+    /* CTA */
+    .cta-section {
+      text-align: center;
+      background: radial-gradient(ellipse 70% 60% at 50% 50%, rgba(34,197,94,.07) 0%, transparent 70%);
+      border-top: 1px solid var(--border);
+    }
+    .cta-section h2 { font-size: clamp(2rem, 5vw, 3rem); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 1rem; }
+    .cta-section p { color: var(--muted); font-size: 1.05rem; margin-bottom: 2.5rem; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted); font-size: .85rem;
+    }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: var(--accent); }
+    .footer-links { display: flex; gap: 1.5rem; justify-content: center; margin-top: .5rem; }
+
+    @media (max-width: 600px) {
+      nav { padding: 0 1rem; }
+      .hero { padding: 5rem 1.25rem 3.5rem; }
+      section { padding: 3.5rem 1.25rem; }
+    }
+  </style>
+
+  <!-- i18n:hreflang:start -->
+  <link rel="alternate" hreflang="en" href="https://lamar.hackatoa.com/" />
+  <link rel="alternate" hreflang="es" href="https://lamar.hackatoa.com/es/" />
+  <link rel="alternate" hreflang="pt-BR" href="https://lamar.hackatoa.com/pt-br/" />
+  <link rel="alternate" hreflang="fr" href="https://lamar.hackatoa.com/fr/" />
+  <link rel="alternate" hreflang="de" href="https://lamar.hackatoa.com/de/" />
+  <link rel="alternate" hreflang="vi" href="https://lamar.hackatoa.com/vi/" />
+  <link rel="alternate" hreflang="th" href="https://lamar.hackatoa.com/th/" />
+  <link rel="alternate" hreflang="x-default" href="https://lamar.hackatoa.com/" />
+  <!-- i18n:hreflang:end -->
+</head>
+<body>
+<!-- i18n:switcher:start -->
+<div id="lang-switch" style="position:fixed;top:8px;right:10px;z-index:99999;font-family:system-ui,-apple-system,sans-serif"><button id="lang-btn" type="button" aria-label="Language" aria-haspopup="true" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;background:rgba(6,10,6,.92);border:1px solid #1a3d1a;border-radius:999px;color:#8a8;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg></button><div id="lang-pop" role="menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;flex-direction:column;gap:8px;background:rgba(6,10,6,.95);border:1px solid #1a3d1a;border-radius:10px;padding:9px 12px;box-shadow:0 4px 16px rgba(0,0,0,.6);font-size:12px;white-space:nowrap"><a href="/" hreflang="en" style="color:#8a8;text-decoration:none;">EN</a>
+  <a href="/es/" hreflang="es" aria-current="true" style="color:#fff;font-weight:700;text-decoration:none;">ES</a>
+  <a href="/pt-br/" hreflang="pt-BR" style="color:#8a8;text-decoration:none;">PT</a>
+  <a href="/fr/" hreflang="fr" style="color:#8a8;text-decoration:none;">FR</a>
+  <a href="/de/" hreflang="de" style="color:#8a8;text-decoration:none;">DE</a>
+  <a href="/vi/" hreflang="vi" style="color:#8a8;text-decoration:none;">VI</a>
+  <a href="/th/" hreflang="th" style="color:#8a8;text-decoration:none;">TH</a></div></div>
+<script>(function(){var b=document.getElementById('lang-btn'),p=document.getElementById('lang-pop');if(!b||!p)return;var d=p.querySelector('a:not([aria-current])');if(d&&d.style&&d.style.color)b.style.color=d.style.color;b.addEventListener('click',function(e){e.stopPropagation();p.style.display=p.style.display==='flex'?'none':'flex';});p.addEventListener('click',function(e){e.stopPropagation();});document.addEventListener('click',function(){p.style.display='none';});})();</script>
+<!-- i18n:switcher:end -->
+
+<nav>
+  <span class="nav-brand">Lamar Bot</span>
+  <div class="nav-links">
+    <a href="#features">Características</a>
+    <a href="#commands">Comandos</a>
+    <a href="#how-to">Cómo usar</a>
+    <a href="https://discord.com/oauth2/authorize?client_id=1136636484900888597&permissions=19456&scope=bot" class="nav-cta">Añadir a Discord</a>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="hero-tag">Bot de Discord · GTA V · Con IA · <span id="lamar-server-count">—</span> Servidores</div>
+  <h1>Lamar está en<br/><span>tu servidor ahora.</span></h1>
+  <p>Lamar Davis de GTA V — bocazas, caótico y con tecnología de Gemini AI. Habla con él, juega y prepárate para que te rosticen.</p>
+  <div class="hero-buttons">
+    <a href="https://discord.com/oauth2/authorize?client_id=1136636484900888597&permissions=19456&scope=bot" class="btn btn-primary">Añadir a Discord</a>
+    <a href="https://github.com/Hackatoan/Lamar" class="btn btn-secondary">Ver en GitHub</a>
+  </div>
+</section>
+
+<div class="quote-section">
+  <div class="quote">
+    "¿Sabes cuál es tu problema? No tienes calle, hermano. Te quedas ahí sentado esperando a que pase algo. Así no funcionan las cosas."
+  </div>
+  <div class="quote-attr">— Lamar Davis, probablemente</div>
+</div>
+
+<section id="features">
+  <div class="section-inner">
+    <div class="section-label">Lo que hace</div>
+    <h2 class="section-title">Todo lo que esperarías<br/>de Lamar.</h2>
+    <p class="section-desc">Conversaciones con IA, juegos y caos puro. Todo en el papel.</p>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">🤖</div>
+        <h3>Conversaciones con IA</h3>
+        <p>Menciona a @Lamar en cualquier mensaje y responderá en su papel — tiene memoria, así que realmente recuerda lo que dijiste.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">✊</div>
+        <h3>Comandos de ataque</h3>
+        <p>Rostiza a otros miembros del servidor con movimientos de ataque sacados directamente del universo de GTA V. Al estilo Lamar, obvio.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🪨</div>
+        <h3>Piedra, papel o tijera</h3>
+        <p>Desafía a Lamar a una partida. Te hablará mal tanto si ganas como si pierdes.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📖</div>
+        <h3>Historias</h3>
+        <p>Lamar tiene historias que contar. Pídele una y prepárate.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Personaje completo</h3>
+        <p>Jerga, insultos, lealtad — el paquete completo. Sin filtros, todo Lamar.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Memoria</h3>
+        <p>Lamar recuerda las conversaciones pasadas con cada usuario para que los chats mantengan el contexto.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="commands" class="commands-section">
+  <div class="section-inner">
+    <div class="section-label">Comandos</div>
+    <h2 class="section-title">Cómo hablar con él.</h2>
+    <p class="section-desc">Todos los comandos usan el prefijo <code>lamar</code>. O simplemente menciónalo directamente para chatear con la IA.</p>
+
+    <div class="cmd-grid">
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">@Lamar [mensaje]</div>
+          <div class="cmd-desc">Conversación con IA — responde en su papel con memoria de mensajes pasados</div>
+        </div>
+      </div>
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">lamar help</div>
+          <div class="cmd-desc">Muestra todos los comandos disponibles</div>
+        </div>
+      </div>
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">lamar attack @user</div>
+          <div class="cmd-desc">Ataca a otro miembro al estilo Lamar</div>
+        </div>
+      </div>
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">lamar rps [rock|paper|scissors]</div>
+          <div class="cmd-desc">Desafía a Lamar a piedra, papel o tijera</div>
+        </div>
+      </div>
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">lamar story 1</div>
+          <div class="cmd-desc">Escucha una de las historias de Lamar</div>
+        </div>
+      </div>
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">lamar nword</div>
+          <div class="cmd-desc">Ya sabes lo que hace</div>
+        </div>
+      </div>
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">lamar die</div>
+          <div class="cmd-desc">Haz que Lamar... conozca su fin</div>
+        </div>
+      </div>
+      <div class="cmd-card">
+        <div>
+          <div class="cmd-name">lamar shoot @user</div>
+          <div class="cmd-desc">Dispara a alguien (dentro del bot, tranquilo)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="how-to">
+  <div class="section-inner">
+    <div class="section-label">Primeros pasos</div>
+    <h2 class="section-title">Invitar. Listo.</h2>
+    <p class="section-desc">No requiere configuración. Añade el bot y empieza a hablar.</p>
+
+    <div class="how-steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div>
+          <h4>Añade a Lamar a tu servidor</h4>
+          <p>Haz clic en el enlace de invitación; solo necesita permisos básicos de mensajes.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div>
+          <h4>Menciónalo para chatear</h4>
+          <p>Escribe <code>@Lamar your message here</code> y responderá en su papel. Recuerda la conversación.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div>
+          <h4>Usa los comandos de lamar</h4>
+          <p>Escribe <code>lamar help</code> para ver todos los comandos disponibles para juegos, ataques y más.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cta-section">
+  <div class="section-inner">
+    <h2>Añade a Lamar a tu servidor.</h2>
+    <p>No va a pedir las cosas por las buenas. Solo agrégalo.</p>
+    <a href="https://discord.com/oauth2/authorize?client_id=1136636484900888597&permissions=19456&scope=bot" class="btn btn-primary" style="font-size:1.05rem;padding:.9rem 2.25rem;">Añadir a Discord</a>
+  </div>
+</section>
+
+<footer>
+  <div>Creado por <a href="https://hackatoa.com">hackatoa.com</a></div>
+  <div class="footer-links">
+    <a href="https://github.com/Hackatoan/Lamar">GitHub</a>
+    <a href="https://hackatoa.com">hackatoa.com</a>
+    <a href="https://buymeacoffee.com/hackatoa">Invítame a un café</a>
+  </div>
+</footer>
+
+<script>
+fetch("https://lamar-api.hackatoa.com/stats")
+  .then(r=>r.json())
+  .then(d=>{ if(d.guilds) document.getElementById("lamar-server-count").textContent = d.guilds.toLocaleString(); })
+  .catch(()=>{});
+</script>
+</body>
+</html>
