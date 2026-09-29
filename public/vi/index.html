@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://lamar-api.hackatoa.com; base-uri 'self'; form-action 'self'" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self' https://lamar-api.hackatoa.com; base-uri 'self'; form-action 'self'" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   <link rel="preconnect" href="https://lamar-api.hackatoa.com" crossorigin />
   <link rel="dns-prefetch" href="https://lamar-api.hackatoa.com" />
@@ -61,7 +61,7 @@
   <a href="/de/" hreflang="de" role="menuitem" style="color:#8a8;text-decoration:none;">DE</a>
   <a href="/vi/" hreflang="vi" role="menuitem" aria-current="true" style="color:#fff;font-weight:700;text-decoration:none;">VI</a>
   <a href="/th/" hreflang="th" role="menuitem" style="color:#8a8;text-decoration:none;">TH</a></div></div>
-<script>(function(){var b=document.getElementById('lang-btn'),p=document.getElementById('lang-pop');if(!b||!p)return;var d=p.querySelector('a:not([aria-current])');if(d&&d.style&&d.style.color)b.style.color=d.style.color;function close(){p.style.display='none';b.setAttribute('aria-expanded','false');}b.addEventListener('click',function(e){e.stopPropagation();if(p.style.display==='flex'){close();}else{p.style.display='flex';b.setAttribute('aria-expanded','true');}});p.addEventListener('click',function(e){e.stopPropagation();});document.addEventListener('click',close);document.addEventListener('keydown',function(e){if(e.key==='Escape'){close();b.focus();}});})();</script>
+<script src="/assets/lang-switcher.js" defer></script>
 <!-- i18n:switcher:end -->
 
 <nav>
@@ -245,11 +245,6 @@
   </div>
 </footer>
 
-<script>
-fetch("https://lamar-api.hackatoa.com/stats")
-  .then(r=>r.json())
-  .then(d=>{ if(d.guilds) document.getElementById("lamar-server-count").textContent = d.guilds.toLocaleString(); })
-  .catch(()=>{});
-</script>
+<script src="/assets/stats.js" defer></script>
 </body>
 </html>
