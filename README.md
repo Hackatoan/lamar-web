@@ -12,11 +12,11 @@ A small marketing/landing site for the Lamar Discord bot, localized in 6 languag
 
 ## Tech Stack
 
-Static HTML · nginx · Docker
+Static HTML
 
 ## Deployment
 
-Docker on the homelab host; GHCR + Watchtower auto-deploy.
+GitHub Pages, auto-deployed via Actions (`.github/workflows/pages.yml`) on every push to `main`.
 
 ## Support
 
