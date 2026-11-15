@@ -5,14 +5,18 @@
 // Injects hreflang + a language switcher, fixes relative asset paths for
 // /<locale>/ subdirs, and writes a hreflang sitemap. Config: i18n.config.json.
 //   Usage: GEMINI_API_KEY=... node scripts/i18n-auto.mjs
-import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
+//          node scripts/i18n-auto.mjs --offline   (free: reuses the translations
+//          already committed at HEAD; fails if the English source has new text)
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const cfg = JSON.parse(readFileSync(join(ROOT, 'i18n.config.json'), 'utf8'));
 const KEY = process.env.GEMINI_API_KEY;
-if (!KEY) { console.error('GEMINI_API_KEY not set'); process.exit(1); }
+const OFFLINE = process.argv.includes('--offline');
+if (!KEY && !OFFLINE) { console.error('GEMINI_API_KEY not set (or pass --offline to reuse committed translations)'); process.exit(1); }
 const MODEL = process.env.GEMINI_MODEL || 'gemini-flash-lite-latest';
 const ORIGIN = cfg.origin;
 const LOCALES = cfg.locales;
@@ -77,6 +81,31 @@ function apply(html, map) {
   return restore(s, blocks);
 }
 
+// --offline: align the committed English page with its committed translation
+// (same tag structure) to recover an English->locale map without any API call.
+const gitShow = (rel) => { try { return execFileSync('git', ['show', `HEAD:${rel}`], { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); } catch { return null; } };
+function pieces(html) {
+  const { out } = protect(html);
+  const all = (re) => [...out.matchAll(re)].map((m) => m[1]);
+  return [
+    all(/>([^<>]+)</g),
+    all(/<meta\s+name="(?:description|keywords|twitter:title|twitter:description)"\s+content="([^"]*)"/gi),
+    all(/<meta\s+property="(?:og:title|og:description)"\s+content="([^"]*)"/gi),
+    all(/(?:placeholder|alt|aria-label)="([^"]*)"/gi),
+  ];
+}
+function committedMap(page, loc) {
+  const locRel = `public/${page.file === cfg.rootFile ? `${loc}/index.html` : `${loc}/${page.file}`}`;
+  const en = gitShow(`public/${page.file}`), tr = gitShow(locRel);
+  if (!en || !tr) throw new Error(`--offline: ${locRel} not committed at HEAD`);
+  const a = pieces(strip(en)), b = pieces(strip(tr)), map = new Map();
+  a.forEach((list, k) => {
+    if (list.length !== b[k].length) throw new Error(`--offline: ${locRel} structure differs from English at HEAD; run online`);
+    list.forEach((v, i) => { if (hasLetter(v) && !map.has(v)) map.set(v, b[k][i]); });
+  });
+  return map;
+}
+
 const pageUrl = (page, l) => `${ORIGIN}${l === 'en' ? '' : '/' + l}${page.urlPath}`;
 const hreflangBlock = (page) => {
   const links = LOCALES.map((l) => `  <link rel="alternate" hreflang="${HREFLANG[l]}" href="${pageUrl(page, l)}" />`);
@@ -88,14 +117,15 @@ const switcher = (page, cur) => {
     const a = l === cur; const path = l === 'en' ? (page.urlPath || '/') : `/${l}${page.urlPath}`;
     return `<a href="${path}" hreflang="${HREFLANG[l]}" role="menuitem"${a ? ' aria-current="true"' : ''} style="${a ? 'color:#fff;font-weight:700;' : 'color:#8a8;'}text-decoration:none;">${LABEL[l]}</a>`;
   });
-  return `\n<!-- i18n:switcher:start -->\n<div id="lang-switch" style="position:relative;display:flex;justify-content:flex-end;padding:6px 10px;z-index:99999;font-family:system-ui,-apple-system,sans-serif"><button id="lang-btn" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;background:rgba(6,10,6,.92);border:1px solid #1a3d1a;border-radius:999px;color:#8a8;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg></button><div id="lang-pop" role="menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;flex-direction:column;gap:8px;background:rgba(6,10,6,.95);border:1px solid #1a3d1a;border-radius:10px;padding:9px 12px;box-shadow:0 4px 16px rgba(0,0,0,.6);font-size:12px;white-space:nowrap">\n  ${items.join('\n  ')}\n</div></div>\n<script src="/assets/lang-switcher.js" defer></script>\n<!-- i18n:switcher:end -->`;
+  return `\n<!-- i18n:switcher:start -->\n<div id="lang-switch" style="position:relative;display:flex;justify-content:flex-end;padding:6px 10px;z-index:99999;font-family:system-ui,-apple-system,sans-serif"><button id="lang-btn" type="button" aria-label="Language" aria-haspopup="true" aria-expanded="false" style="display:flex;align-items:center;justify-content:center;width:34px;height:34px;padding:0;background:rgba(6,10,6,.92);border:1px solid #1a3d1a;border-radius:999px;color:#8a8;cursor:pointer;box-shadow:0 2px 10px rgba(0,0,0,.5)"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><line x1="3" y1="12" x2="21" y2="12"/><ellipse cx="12" cy="12" rx="4" ry="9"/></svg></button><div id="lang-pop" role="menu" style="display:none;position:absolute;top:calc(100% + 8px);right:0;flex-direction:column;gap:8px;background:rgba(6,10,6,.95);border:1px solid #1a3d1a;border-radius:10px;padding:9px 12px;box-shadow:0 4px 16px rgba(0,0,0,.6);font-size:12px;white-space:nowrap">${items.join('\n  ')}</div></div>\n<script src="/assets/lang-switcher.js" defer></script>\n<!-- i18n:switcher:end -->`;
 };
 const strip = (h) => h
   .replace(/\s*<!-- i18n:hreflang:start -->[\s\S]*?<!-- i18n:hreflang:end -->/g, '')
   .replace(/\s*<!-- i18n:switcher:start -->[\s\S]*?<!-- i18n:switcher:end -->/g, '');
+// switcher goes after the skip link (if any) so "Skip to content" stays the first tab stop
 const inject = (html, page, cur) => html
   .replace('</head>', `${hreflangBlock(page)}\n</head>`)
-  .replace(/(<body[^>]*>)/, `$1${switcher(page, cur)}`);
+  .replace(/(<body[^>]*>(?:\s*<a class="skip-link"[^>]*>[^<]*<\/a>)?)/, `$1${switcher(page, cur)}`);
 
 const tagCount = (h) => (h.match(/<[a-zA-Z!\/][^>]*>/g) || []).length;
 const idList = (h) => JSON.stringify([...h.matchAll(/\bid="([^"]+)"/g)].map((m) => m[1]));
@@ -104,17 +134,29 @@ const idList = (h) => JSON.stringify([...h.matchAll(/\bid="([^"]+)"/g)].map((m) 
 const bases = {};
 for (const page of cfg.pages) bases[page.file] = strip(readFileSync(join(ROOT, 'public', page.file), 'utf8'));
 
-for (const page of cfg.pages) writeFileSync(join(ROOT, 'public', page.file), inject(bases[page.file], page, 'en'));
+// URLs whose HTML actually changed this run; others keep their sitemap <lastmod>
+const changed = new Set();
+for (const page of cfg.pages) {
+  const p = join(ROOT, 'public', page.file), out = inject(bases[page.file], page, 'en');
+  if (readFileSync(p, 'utf8') !== out) changed.add(pageUrl(page, 'en'));
+  writeFileSync(p, out);
+}
 console.log('en    -> hreflang + switcher injected into source pages');
 
 let drift = 0;
 for (const loc of LOCALES.filter((l) => l !== 'en')) {
   for (const page of cfg.pages) {
     const src = bases[page.file];
-    const map = new Map();
+    let map = new Map();
     const uniq = collect(src);
-    const tr = await translateBatch(uniq, LANGNAME[loc], loc);
-    uniq.forEach((v, i) => map.set(v, tr[i]));
+    if (OFFLINE) {
+      map = committedMap(page, loc);
+      const missing = uniq.filter((v) => !map.has(v));
+      if (missing.length) { console.error(`--offline: ${loc}/${page.file} has untranslated strings; run with GEMINI_API_KEY:`, missing); process.exit(1); }
+    } else {
+      const tr = await translateBatch(uniq, LANGNAME[loc], loc);
+      uniq.forEach((v, i) => map.set(v, tr[i]));
+    }
     let out = apply(src, map);
     out = out.replace(/<html lang="en">/i, `<html lang="${loc}">`);
     out = out.replace(/\b(href|src)="(?!https?:|\/|#|data:|mailto:)([^"]+)"/g, (m, a, p) => `${a}="/${p}"`);
@@ -130,17 +172,20 @@ for (const loc of LOCALES.filter((l) => l !== 'en')) {
     out = inject(out, page, loc);
     const outPath = page.file === cfg.rootFile ? join(ROOT, `public/${loc}/index.html`) : join(ROOT, `public/${loc}/${page.file}`);
     mkdirSync(dirname(outPath), { recursive: true });
+    if (!existsSync(outPath) || readFileSync(outPath, 'utf8') !== out) changed.add(pageUrl(page, loc));
     writeFileSync(outPath, out);
   }
   console.log(`${loc.padEnd(5)} -> ${cfg.pages.length} page(s)`);
-  await sleep(1200);
+  if (!OFFLINE) await sleep(1200);
 }
 
 const today = new Date().toISOString().slice(0, 10);
+const smPath = join(ROOT, 'public/sitemap.xml');
+const prevMod = new Map(existsSync(smPath) ? [...readFileSync(smPath, 'utf8').matchAll(/<loc>([^<]+)<\/loc>\s*<lastmod>([^<]+)<\/lastmod>/g)].map((m) => [m[1], m[2]]) : []);
 const urls = cfg.pages.flatMap((page) => LOCALES.map((l) => {
   const alts = LOCALES.map((x) => `    <xhtml:link rel="alternate" hreflang="${HREFLANG[x]}" href="${pageUrl(page, x)}"/>`).join('\n')
     + `\n    <xhtml:link rel="alternate" hreflang="x-default" href="${pageUrl(page, 'en')}"/>`;
-  return `  <url>\n    <loc>${pageUrl(page, l)}</loc>\n    <lastmod>${today}</lastmod>\n${alts}\n  </url>`;
+  return `  <url>\n    <loc>${pageUrl(page, l)}</loc>\n    <lastmod>${changed.has(pageUrl(page, l)) ? today : prevMod.get(pageUrl(page, l)) || today}</lastmod>\n${alts}\n  </url>`;
 })).join('\n');
-writeFileSync(join(ROOT, 'public/sitemap.xml'), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`);
+writeFileSync(smPath, `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${urls}\n</urlset>\n`);
 console.log(`sitemap -> public/sitemap.xml\n${drift ? drift + ' page(s) drifted — inspect!' : 'Done. No structure drift.'}`);
